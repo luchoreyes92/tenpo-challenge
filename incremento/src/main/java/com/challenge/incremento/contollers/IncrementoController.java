@@ -18,7 +18,7 @@ public class IncrementoController {
     @Autowired
     IncrementoService incrementoService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/incremento", method = RequestMethod.GET)
     public ResponseEntity<?> calcularIncremento(@NonNull @RequestParam("valor1") Double valor1,
                                                 @NonNull @RequestParam("valor2") Double valor2) {
 

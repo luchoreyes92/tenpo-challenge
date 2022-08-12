@@ -87,4 +87,19 @@ public class IncrementoIntegrationTest {
         assertEquals(expected, jsonNode.get("mensaje").asText());
     }
 
+    @Test
+    public void calcularIncrementoHttpServerErrorExceptionTest() throws Exception {
+        String expected = "No es posible calcular el incremento";
+        String result = mockMvc
+                .perform(MockMvcRequestBuilders.get(URI_CALCULAR_INCREMENTO)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .param("valor1", "1")
+                        .param("valor2", "1")
+                ).andExpect(status().is5xxServerError()).andReturn().getResponse().getContentAsString();
+
+        JsonNode jsonNode = objectMapper.readTree(result);
+        assertNotNull(jsonNode.get("mensaje"));
+        assertEquals(expected, jsonNode.get("mensaje").asText());
+    }
+
 }

@@ -1,12 +1,12 @@
 package com.challenge.incremento.dtos;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Builder
+@AllArgsConstructor
 public class PorcentajeDTO {
 
     private Double porcentaje;

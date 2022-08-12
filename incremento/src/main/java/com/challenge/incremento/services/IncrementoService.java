@@ -4,13 +4,14 @@ import com.challenge.incremento.dtos.PorcentajeDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.util.retry.Retry;
-
 import java.time.Duration;
 
 @Service
@@ -18,7 +19,6 @@ import java.time.Duration;
 @EnableScheduling
 public class IncrementoService {
 
-    private Double porcentaje = 1.0;
     @Value("${BASE_PATH}")
     private String basePath;
     @Value("${INCREMENTO_PATH}")
@@ -28,10 +28,14 @@ public class IncrementoService {
     @Value("${DURATION_REQUEST}")
     private Integer durationRequest;
 
+    //TODO meter valor en base de datos..
+    private Double porcentaje = null;
+
     @Autowired
     WebClient.Builder webClient;
 
     public Double calcularIncremento(Double valor1, Double valor2) {
+        validarPorcentaje();
         return valor1 + valor2 * porcentaje;
     }
 
@@ -50,6 +54,13 @@ public class IncrementoService {
 
         if (existeNuevoPorcentaje(porcentaje)) {
             this.porcentaje = 1.0 + (porcentaje.getPorcentaje() / 100);
+        }
+    }
+
+    private void validarPorcentaje() {
+        if (this.porcentaje == null) {
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No es posible calcular el incremento");
         }
     }
 

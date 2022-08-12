@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.client.HttpServerErrorException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,14 +47,15 @@ public class IncrementoControllerTest {
     }
 
     @Test
-    public void calcularIncrementoIllegalArgumentExceptionTest() {
-        String expected = "Ningún valor puede ser negativo";
-        assertThrows(IllegalArgumentException.class, () -> {
-            ResponseEntity<?> result = incrementoController.calcularIncremento(-1.0, 1.0);
-            assertNotNull(result.getBody());
-            assertEquals(result.getStatusCode(), HttpStatus.BAD_REQUEST);
-            assertEquals(expected, ((ErrorResponseDTO) result.getBody()).getMensaje());
-        });
+    public void calcularIncrementoHttpServerErrorExceptionTest() {
+        String expected = "No es posible calcular el incremento";
+        when(incrementoService.calcularIncremento(any(), any()))
+                .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "No es posible calcular el incremento"));
+        ResponseEntity<?> result = incrementoController.calcularIncremento(1.0, 1.0);
+        assertNotNull(result.getBody());
+        assertEquals(result.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        assertEquals(expected, ((ErrorResponseDTO) result.getBody()).getMensaje());
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpServerErrorException;
 
 @ControllerAdvice
 @Slf4j
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO response = ErrorResponseDTO.builder()
                 .mensaje(ex.getMessage()).build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpServerErrorException.class)
+    public ResponseEntity<?> httpServerErrorException(HttpServerErrorException ex) {
+        ErrorResponseDTO response = ErrorResponseDTO.builder()
+                .mensaje(ex.getStatusText()).build();
+        return new ResponseEntity<>(response, ex.getStatusCode());
     }
 
 }
